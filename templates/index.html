@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Manager - My Sites</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Password Manager</h1>
+            <p>Manage your site login credentials</p>
+        </div>
+
+        {% if let Some(message) = message %}
+        <div class="message">{{ message }}</div>
+        {% endif %}
+
+        <div class="card">
+            <div class="toolbar">
+                <div class="search-container">
+                    <form method="get" action="/" class="search-form">
+                        <input type="text" 
+                               name="q" 
+                               value="{{ search_query }}" 
+                               placeholder="Search sites, URLs, or usernames...">
+                        <button type="submit" class="btn-search">Search</button>
+                        {% if !search_query.is_empty() %}
+                        <a href="/" class="btn-clear">Clear</a>
+                        {% endif %}
+                    </form>
+                </div>
+                <a href="/add" class="btn-primary">
+                    <span class="icon">+</span> Add New Site
+                </a>
+            </div>
+
+            {% if sites.is_empty() %}
+                <div class="no-data">
+                    {% if !search_query.is_empty() %}
+                    <p>No sites found matching "{{ search_query }}".</p>
+                    <a href="/" class="btn-secondary">Show All Sites</a>
+                    {% else %}
+                    <p>No sites saved yet.</p>
+                    <a href="/add" class="btn-primary">Add Your First Site</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Site Name</th>
+                                <th>URL</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for site in sites %}
+                            <tr>
+                                <td class="site-name">{{ site.name }}</td>
+                                <td class="site-url">
+                                    <a href="{{ site.url }}" target="_blank" rel="noopener">
+                                        {{ site.url }}
+                                    </a>
+                                </td>
+                                <td class="username">{{ site.username }}</td>
+                                <td class="password">
+                                    <span class="password-masked">••••••••</span>
+                                    <button type="button" class="btn-show-password" 
+                                            onclick="togglePassword(this, '{{ site.password }}')">
+                                        Show
+                                    </button>
+                                </td>
+                                <td class="notes">{{ site.notes }}</td>
+                                <td class="actions">
+                                    <div class="action-buttons">
+                                        <a href="/edit/{{ site.id.as_ref().unwrap() }}" class="btn-edit">
+                                            Edit
+                                        </a>
+                                        <form method="post" action="/sites/{{ site.id.as_ref().unwrap() }}/delete" 
+                                              onsubmit="return confirm('Are you sure you want to delete {{ site.name }}?')">
+                                            <button type="submit" class="btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="summary">
+                    <p>Showing {{ sites.len() }} site(s){% if !search_query.is_empty() %} matching "{{ search_query }}"{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(button, realPassword) {
+            const passwordCell = button.parentElement;
+            const maskedSpan = passwordCell.querySelector('.password-masked');
+            
+            if (button.textContent === 'Show') {
+                maskedSpan.textContent = realPassword;
+                button.textContent = 'Hide';
+                maskedSpan.classList.add('visible');
+            } else {
+                maskedSpan.textContent = '••••••••';
+                button.textContent = 'Show';
+                maskedSpan.classList.remove('visible');
+            }
+        }
+
+        // Add keyboard shortcut for adding new site
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                window.location.href = '/add';
+            }
+        });
+    </script>
+</body>
+</html>

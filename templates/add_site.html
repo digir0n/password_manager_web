@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if edit_site.is_some() %}Edit Site{% else %}Add New Site{% endif %} - Password Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{% if edit_site.is_some() %}Edit Site{% else %}Add New Site{% endif %}</h1>
+            <p>{% if edit_site.is_some() %}Update the site credentials{% else %}Add new site login credentials{% endif %}</p>
+        </div>
+
+        {% if let Some(message) = message %}
+        <div class="message">{{ message }}</div>
+        {% endif %}
+
+        <div class="card">
+            <form method="post" action="{% if edit_site.is_some() %}/sites/update{% else %}/sites{% endif %}">
+                {% if let Some(site) = edit_site %}
+                <input type="hidden" name="id" value="{{ site.id.as_ref().unwrap() }}">
+                {% endif %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Site Name *</label>
+                        <input type="text" id="name" name="name" 
+                               value="{% if let Some(site) = edit_site %}{{ site.name }}{% endif %}" 
+                               required placeholder="e.g., Google, GitHub">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="url">URL *</label>
+                        <input type="text" id="url" name="url" 
+                               value="{% if let Some(site) = edit_site %}{{ site.url }}{% endif %}" 
+                               required placeholder="https://example.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <input type="text" id="username" name="username" 
+                               value="{% if let Some(site) = edit_site %}{{ site.username }}{% endif %}" 
+                               required placeholder="Your username or email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <input type="text" id="password" name="password" 
+                               value="{% if let Some(site) = edit_site %}{{ site.password }}{% endif %}" 
+                               required placeholder="Your password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" rows="3" 
+                              placeholder="Any additional notes about this account">{% if let Some(site) = edit_site %}{{ site.notes }}{% endif %}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        {% if edit_site.is_some() %}Update Site{% else %}Add Site{% endif %}
+                    </button>
+                    <a href="/" class="btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Focus on the first input field
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstInput = document.querySelector('input[type="text"]');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

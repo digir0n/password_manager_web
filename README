@@ -1,0 +1,33 @@
+# Password Manager Web App
+
+A secure CRUD web application built with Rust and SQLite for managing site login credentials.
+
+## Features
+
+- 🔐 User authentication with bcrypt password hashing
+- 💾 SQLite database for data persistence
+- ➕ Add new site credentials
+- 👀 View saved credentials (passwords masked)
+- 🗑️ Delete site entries
+- 🎨 Responsive web interface
+- 🔒 Secure password storage
+
+## Default Login Credentials
+
+- **Username:** admin
+- **Password:** admin123
+
+## Installation & Setup
+
+### Prerequisites
+
+- Rust and Cargo installed on your system
+- SQLite3 development libraries
+
+### Running the Application
+
+1. **Extract the project files**
+2. **Navigate to the project directory**
+3. **Build and run the application:**
+   ```bash
+   cargo run
